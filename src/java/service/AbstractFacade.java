@@ -1,19 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package service;
 
+import entities.Bikestation;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
-/**
- *
- * @author USUARIO
- */
+
 public abstract class AbstractFacade<T> {
 
+    private final String RESPONSE_OK = "SERVER_OK";
+    private final String RESPONSE_KO = "SERVER_KO";
+    
     private Class<T> entityClass;
 
     public AbstractFacade(Class<T> entityClass) {
@@ -26,12 +24,44 @@ public abstract class AbstractFacade<T> {
         getEntityManager().persist(entity);
     }
 
-    public void edit(T entity) {
-        getEntityManager().merge(entity);
+    public String edit(T entity, Integer id, String op) {
+        final String OP_TAKE = "take";
+        //Request bike status depending on the operation requested (take or leave)
+        EntityManager em = getEntityManager();
+        Query query;
+        
+        boolean isStatusOk = false;
+        
+        query = em.createNamedQuery("Bikestation.getAvailable", Bikestation.class);
+        query.setParameter("id", id);
+        int available = (int)query.getSingleResult();
+        
+        if(op.equals(OP_TAKE)) 
+            isStatusOk = available > 0;
+        else { //leaving bike            
+            query = em.createNamedQuery("Bikestation.getTotal", Bikestation.class);
+            query.setParameter("id", id);
+            int total = (int)query.getSingleResult();
+            
+            query = em.createNamedQuery("Bikestation.getBroken", Bikestation.class);
+            query.setParameter("id", id);
+            int broken = (int)query.getSingleResult();
+            
+            query = em.createNamedQuery("Bikestation.getReserved", Bikestation.class);
+            query.setParameter("id", id);
+            int reserved = (int)query.getSingleResult();
+            
+            isStatusOk = total > available + broken + reserved;
+        }
+        
+        if(isStatusOk) {
+            getEntityManager().merge(entity);
+            return RESPONSE_OK;
+        }
+        
+        return RESPONSE_KO;
     }
-
     
-
     public void remove(T entity) {
         getEntityManager().remove(getEntityManager().merge(entity));
     }

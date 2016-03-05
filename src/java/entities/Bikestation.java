@@ -21,10 +21,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author USUARIO
- */
 @Entity
 @Table(name = "bikestation")
 @XmlRootElement
@@ -39,7 +35,13 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Bikestation.findByLatitude", query = "SELECT b FROM Bikestation b WHERE b.latitude = :latitude"),
     @NamedQuery(name = "Bikestation.findByLongitude", query = "SELECT b FROM Bikestation b WHERE b.longitude = :longitude"),
     @NamedQuery(name = "Bikestation.findByMd5", query = "SELECT b FROM Bikestation b WHERE b.md5 = :md5"),
-    @NamedQuery(name = "Bikestation.findByTimestampBike", query = "SELECT b FROM Bikestation b WHERE b.timestampBike = :timestampBike")})
+    @NamedQuery(name = "Bikestation.findByTimestampBike", query = "SELECT b FROM Bikestation b WHERE b.timestampBike = :timestampBike"),
+    
+    @NamedQuery(name = "Bikestation.getAvailable", query = "SELECT b.available FROM Bikestation b WHERE b.serverId = :id"),
+    @NamedQuery(name = "Bikestation.getBroken", query = "SELECT b.broken FROM Bikestation b WHERE b.serverId = :id"),
+    @NamedQuery(name = "Bikestation.getReserved", query = "SELECT b.reserved FROM Bikestation b WHERE b.serverId = :id"),
+    @NamedQuery(name = "Bikestation.getTotal", query = "SELECT b.total FROM Bikestation b WHERE b.serverId = :id")})
+
 public class Bikestation implements Serializable {
 
     private static final long serialVersionUID = 1L;
