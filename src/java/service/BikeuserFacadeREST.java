@@ -1,7 +1,11 @@
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package service;
 
-import entities.Bikestation;
+import entities.Bikeuser;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -16,36 +20,32 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-/**
- *
- * @author USUARIO
- */
+
 @Stateless
-@Path("entities.bikestation")
-public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
+@Path("entities.bikeuser")
+public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
 
     @PersistenceContext(unitName = "BikesManagerPU")
     private EntityManager em;
-    
-    public BikestationFacadeREST() {
-        super(Bikestation.class);
+
+    public BikeuserFacadeREST() {
+        super(Bikeuser.class);
     }
 
     @POST
     @Override
     @Consumes(MediaType.APPLICATION_JSON)
-    public void create(Bikestation entity) {
-        super.create(entity);   
+    public void create(Bikeuser entity) {
+        super.create(entity);
     }
 
     @PUT
-    @Path("{operation}/{id}")
+    @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public synchronized String edit(@PathParam("id") Integer id, @PathParam("operation") String op, Bikestation entity) {
-        return super.editBikeStation(entity, id, op);
+    public void edit(@PathParam("id") Integer id, Bikeuser entity) {
+        super.edit(entity);
     }
- 
+
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") Integer id) {
@@ -55,21 +55,21 @@ public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
     @GET
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Bikestation find(@PathParam("id") Integer id) {
+    public Bikeuser find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Bikestation> findAll() {
+    public List<Bikeuser> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Bikestation> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<Bikeuser> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
