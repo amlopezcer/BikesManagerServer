@@ -2,6 +2,7 @@
 package service;
 
 import entities.Bikestation;
+import entities.Bikeuser;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -9,6 +10,7 @@ import javax.persistence.Query;
 
 public abstract class AbstractFacade<T> {
 
+    //Standard server responses (used in customiza PUT and POST methods)
     private final String RESPONSE_OK = "SERVER_OK";
     private final String RESPONSE_KO = "SERVER_KO";
     
@@ -59,21 +61,29 @@ public abstract class AbstractFacade<T> {
         return ((Long) q.getSingleResult()).intValue();
     }
     
+    /**
+     * Customize methods
+     */
+    
+    // Edit for the Bikestation (taking and leaving bikes)
     public String editBikeStation(T entity, Integer id, String op) {
+        /**
+         * Same string as in the app, to confirm the op which is being processed, 
+         * no need of a "leave" one because it is an if - else staetment
+         */
         final String OP_TAKE = "take";
-        //Request bike status depending on the operation requested (take or leave)
+
+        //Getting available bikes for the ID requested
         EntityManager em = getEntityManager();
-        Query query;
-        
-        boolean isStatusOk = false;
-        
-        query = em.createNamedQuery("Bikestation.getAvailable", Bikestation.class);
+        Query query = em.createNamedQuery("Bikestation.getAvailable", Bikestation.class);
         query.setParameter("id", id);
         int available = (int)query.getSingleResult();
         
-        if(op.equals(OP_TAKE)) 
+        boolean isStatusOk;
+        
+        if(op.equals(OP_TAKE)) //If I'm taking a bike, I need at least 1 available
             isStatusOk = available > 0;
-        else { //leaving bike            
+        else { //leaving bike           
             query = em.createNamedQuery("Bikestation.getTotal", Bikestation.class);
             query.setParameter("id", id);
             int total = (int)query.getSingleResult();
@@ -95,6 +105,67 @@ public abstract class AbstractFacade<T> {
         }
         
         return RESPONSE_KO;
+    }
+    
+    //Custom user creator (just to assign a correct user server ID)
+    public String createNewUser(T entity) { 
+        Bikeuser bikeuser = (Bikeuser) entity;
+        //Check if the username or email are availables
+        if(isUsernameAvailable(bikeuser.getUsername()) && isEmailAvailable(bikeuser.getEmail())) {
+            bikeuser.setId(getNewUserID());
+            getEntityManager().persist(entity);
+            return RESPONSE_OK;
+        }
+        
+        return RESPONSE_KO;
+    }
+    
+    //Checking if the username is available
+    private boolean isUsernameAvailable(String username) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikeuser.findByUsername", Bikeuser.class);
+        query.setParameter("username", username);
+        
+        try {
+            Bikeuser b = (Bikeuser) query.getSingleResult();
+            return false;
+        } catch(Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return true;
+        }
+    }
+    
+    //Checking if the email is available
+    private boolean isEmailAvailable(String email) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikeuser.findByEmail", Bikeuser.class);
+        query.setParameter("email", email);
+        
+        try {
+            Bikeuser b = (Bikeuser) query.getSingleResult();
+            return false;
+        } catch(Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return true;
+        }
+    }
+    
+    //Getting a new user ID from the server (the highest)
+    private int getNewUserID() {
+        List<Bikeuser> bikeUserList = (List<Bikeuser>) findAll(); //getting the users list
+        if (bikeUserList.isEmpty())
+            return 1;
+        
+        int currentID = 0; 
+        int newID = bikeUserList.get(0).getId();
+        
+        for(Bikeuser bikeuser: bikeUserList) {
+            currentID = bikeuser.getId();
+            if(currentID > newID)
+                newID = currentID;
+        }
+        
+        return newID + 1;
     }
     
 }

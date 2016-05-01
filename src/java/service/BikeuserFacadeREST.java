@@ -33,10 +33,10 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     }
 
     @POST
-    @Override
     @Consumes(MediaType.APPLICATION_JSON)
-    public void create(Bikeuser entity) {
-        super.create(entity);
+    @Produces(MediaType.APPLICATION_JSON)
+    public synchronized String createUser(Bikeuser entity) {
+        return super.createNewUser(entity); //Custom creator for the assignment of a new server ID
     }
 
     @PUT

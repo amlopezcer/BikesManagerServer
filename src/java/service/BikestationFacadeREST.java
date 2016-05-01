@@ -43,7 +43,7 @@ public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public synchronized String edit(@PathParam("id") Integer id, @PathParam("operation") String op, Bikestation entity) {
-        return super.editBikeStation(entity, id, op);
+        return super.editBikeStation(entity, id, op); //Custom editor to distinguish between taking and leaving bikes
     }
  
     @DELETE
@@ -79,7 +79,7 @@ public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
     public String countREST() {
         return String.valueOf(super.count());
     }
-
+    
     @Override
     protected EntityManager getEntityManager() {
         return em;
