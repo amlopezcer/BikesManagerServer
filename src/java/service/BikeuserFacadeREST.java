@@ -33,9 +33,10 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     }
 
     @POST
+    @Override
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public synchronized String createUser(Bikeuser entity) {
+    public synchronized String createNewUser(Bikeuser entity) {
         return super.createNewUser(entity); //Custom creator for the assignment of a new server ID
     }
 
@@ -58,7 +59,14 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     public Bikeuser find(@PathParam("id") Integer id) {
         return super.find(id);
     }
-
+    
+    @GET
+    @Path("user/{username}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Bikeuser findByUsername(@PathParam("username") String username) {
+        return super.findByUsername(username);
+    }
+    
     @GET
     @Override
     @Produces(MediaType.APPLICATION_JSON)

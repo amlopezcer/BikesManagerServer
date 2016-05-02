@@ -156,7 +156,7 @@ public abstract class AbstractFacade<T> {
         if (bikeUserList.isEmpty())
             return 1;
         
-        int currentID = 0; 
+        int currentID; 
         int newID = bikeUserList.get(0).getId();
         
         for(Bikeuser bikeuser: bikeUserList) {
@@ -166,6 +166,20 @@ public abstract class AbstractFacade<T> {
         }
         
         return newID + 1;
+    }
+    
+    public Bikeuser findByUsername(String username) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikeuser.findByUsername", Bikeuser.class);
+        query.setParameter("username", username);
+        
+        try {
+            Bikeuser b = (Bikeuser) query.getSingleResult();
+            return b;
+        } catch(Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return null;
+        }
     }
     
 }
