@@ -43,10 +43,11 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     @PUT
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void edit(@PathParam("id") Integer id, Bikeuser entity) {
-        super.edit(entity);
+    @Produces(MediaType.APPLICATION_JSON)
+    public String edit(@PathParam("id") Integer id, Bikeuser entity) {
+        return super.editBikeUser(entity);
     }
-
+    
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") Integer id) {

@@ -182,4 +182,9 @@ public abstract class AbstractFacade<T> {
         }
     }
     
+    public String editBikeUser(T entity) {
+        getEntityManager().merge(entity);
+        return RESPONSE_OK;
+    }
+    
 }
