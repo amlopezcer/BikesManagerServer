@@ -4,6 +4,7 @@ package service;
 import entities.Bikestation;
 import entities.Bikeuser;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -182,9 +183,52 @@ public abstract class AbstractFacade<T> {
         }
     }
     
-    public String editBikeUser(T entity) {
+    //For operational data (take or leave bike, bookings, balance...), no checks needed
+    public String editOperationalBikeUser(T entity) {
         getEntityManager().merge(entity);
         return RESPONSE_OK;
+    }
+    
+    //For basic data (username, mail...) checks needed
+    public String editBasicBikeUser(T entity) {
+        Bikeuser bikeuser = (Bikeuser) entity;
+        //Check if the username or email are availables
+        if(isUsernameUpdatable(bikeuser) && isEmailUpdatable(bikeuser)) {
+            getEntityManager().merge(entity);
+            return RESPONSE_OK;
+        }
+        
+        return RESPONSE_KO;
+    }
+    
+    //Check if username is available for update
+    private boolean isUsernameUpdatable(Bikeuser bikeuser) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikeuser.findByUsername", Bikeuser.class);
+        query.setParameter("username", bikeuser.getUsername());
+        
+        try {
+            Bikeuser b = (Bikeuser) query.getSingleResult();            
+            return Objects.equals(b.getId(), bikeuser.getId()); //If username and Id match, its me, so I can update myself
+        } catch(Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return true;
+        }    
+    }
+   
+    //Check if email is available for update
+    private boolean isEmailUpdatable(Bikeuser bikeuser) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikeuser.findByEmail", Bikeuser.class);
+        query.setParameter("email", bikeuser.getEmail());
+        
+        try {
+            Bikeuser b = (Bikeuser) query.getSingleResult();
+            return Objects.equals(b.getId(), bikeuser.getId()); //If email and Id match, its me, so I can update myself
+        } catch(Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return true;
+        }
     }
     
 }

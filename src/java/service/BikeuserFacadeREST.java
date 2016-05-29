@@ -45,7 +45,15 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public String edit(@PathParam("id") Integer id, Bikeuser entity) {
-        return super.editBikeUser(entity);
+        return super.editOperationalBikeUser(entity); //Edit for operational operations (take or leave bike, deposit money...)
+    }
+    
+    @PUT
+    @Path("basicdata/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String editBasic(@PathParam("id") Integer id, Bikeuser entity) {
+        return super.editBasicBikeUser(entity); //For basic data (username, mail...)
     }
     
     @DELETE
@@ -61,6 +69,7 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
         return super.find(id);
     }
     
+    //A custom find by username GET
     @GET
     @Path("user/{username}")
     @Produces(MediaType.APPLICATION_JSON)
