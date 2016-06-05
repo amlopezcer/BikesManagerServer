@@ -208,7 +208,7 @@ public abstract class AbstractFacade<T> {
         query.setParameter("username", bikeuser.getUsername());
         
         try {
-            Bikeuser b = (Bikeuser) query.getSingleResult();            
+            Bikeuser b = (Bikeuser) query.getSingleResult();
             return Objects.equals(b.getId(), bikeuser.getId()); //If username and Id match, its me, so I can update myself
         } catch(Exception e) {
             System.out.println(e.getLocalizedMessage());

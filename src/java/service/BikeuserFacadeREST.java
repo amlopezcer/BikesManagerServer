@@ -71,6 +71,7 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     
     //A custom find by username GET
     @GET
+    @Override
     @Path("user/{username}")
     @Produces(MediaType.APPLICATION_JSON)
     public Bikeuser findByUsername(@PathParam("username") String username) {

@@ -41,6 +41,12 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Bikeuser.findByBalance", query = "SELECT b FROM Bikeuser b WHERE b.balance = :balance")})
 public class Bikeuser implements Serializable {
 
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 45)
+    @Column(name = "entityid")
+    private String entityid;
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -269,6 +275,14 @@ public class Bikeuser implements Serializable {
     @Override
     public String toString() {
         return "entities.Bikeuser[ id=" + id + " ]";
+    }
+
+    public String getEntityid() {
+        return entityid;
+    }
+
+    public void setEntityid(String entityid) {
+        this.entityid = entityid;
     }
     
 }
