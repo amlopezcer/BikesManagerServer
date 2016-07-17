@@ -11,9 +11,9 @@ import javax.persistence.Query;
 
 public abstract class AbstractFacade<T> {
 
-    //Standard server responses (used in customiza PUT and POST methods)
-    private final String RESPONSE_OK = "SERVER_OK";
-    private final String RESPONSE_KO = "SERVER_KO";
+    //Standard server responses (%s to get de entity involved)
+    private final String RESPONSE_OK = "%s_SERVER_OK";
+    private final String RESPONSE_KO = "%s_SERVER_KO";
     
     private Class<T> entityClass;
 
@@ -67,58 +67,49 @@ public abstract class AbstractFacade<T> {
      */
     
     // Edit for the Bikestation (taking and leaving bikes)
-    public String editBikeStation(T entity, Integer id, String op) {
+    public String editBikeStation(T entity, String op) {
         /**
          * Same string as in the app, to confirm the op which is being processed, 
          * no need of a "leave" one because it is an if - else staetment
          */
         final String OP_TAKE = "take";
-
-        //Getting available bikes for the ID requested
-        EntityManager em = getEntityManager();
-        Query query = em.createNamedQuery("Bikestation.getAvailable", Bikestation.class);
-        query.setParameter("id", id);
-        int available = (int)query.getSingleResult();
         
+        Bikestation b = (Bikestation) entity;
         boolean isStatusOk;
         
+        int availableBikes = b.getAvailablebikes();
+       
         if(op.equals(OP_TAKE)) //If I'm taking a bike, I need at least 1 available
-            isStatusOk = available > 0;
-        else { //leaving bike           
-            query = em.createNamedQuery("Bikestation.getTotal", Bikestation.class);
-            query.setParameter("id", id);
-            int total = (int)query.getSingleResult();
+            isStatusOk = availableBikes > 0;
+        else { //leaving bike, free moorings needed          
+            int totalMoorings = b.getTotalmoorings();
+            int reservedBikes = b.getReservedbikes();
+            int reservedMoorings = b.getReservedmoorings();
             
-            query = em.createNamedQuery("Bikestation.getBroken", Bikestation.class);
-            query.setParameter("id", id);
-            int broken = (int)query.getSingleResult();
+            int availableMoorings = totalMoorings - availableBikes - reservedBikes - reservedMoorings;
             
-            query = em.createNamedQuery("Bikestation.getReserved", Bikestation.class);
-            query.setParameter("id", id);
-            int reserved = (int)query.getSingleResult();
-            
-            isStatusOk = total > available + broken + reserved;
+            isStatusOk = availableMoorings > 0;
         }
         
         if(isStatusOk) {
             getEntityManager().merge(entity);
-            return RESPONSE_OK;
+            return String.format(RESPONSE_OK, b.getEntityid());
         }
         
-        return RESPONSE_KO;
+        return String.format(RESPONSE_KO, b.getEntityid());
     }
     
     //Custom user creator (just to assign a correct user server ID)
     public String createNewUser(T entity) { 
-        Bikeuser bikeuser = (Bikeuser) entity;
+        Bikeuser b = (Bikeuser) entity;
         //Check if the username or email are availables
-        if(isUsernameAvailable(bikeuser.getUsername()) && isEmailAvailable(bikeuser.getEmail())) {
-            bikeuser.setId(getNewUserID());
+        if(isUsernameAvailable(b.getUsername()) && isEmailAvailable(b.getEmail())) {
+            b.setId(getNewUserID());
             getEntityManager().persist(entity);
-            return RESPONSE_OK;
+            return String.format(RESPONSE_OK, b.getEntityid());
         }
         
-        return RESPONSE_KO;
+        return String.format(RESPONSE_KO, b.getEntityid());
     }
     
     //Checking if the username is available
@@ -128,7 +119,7 @@ public abstract class AbstractFacade<T> {
         query.setParameter("username", username);
         
         try {
-            Bikeuser b = (Bikeuser) query.getSingleResult();
+            Bikeuser b = (Bikeuser) query.getSingleResult(); //Needed to generate the following exception
             return false;
         } catch(Exception e) {
             System.out.println(e.getLocalizedMessage());
@@ -143,7 +134,7 @@ public abstract class AbstractFacade<T> {
         query.setParameter("email", email);
         
         try {
-            Bikeuser b = (Bikeuser) query.getSingleResult();
+            Bikeuser b = (Bikeuser) query.getSingleResult(); //Needed to generate the following exception
             return false;
         } catch(Exception e) {
             System.out.println(e.getLocalizedMessage());
@@ -185,20 +176,21 @@ public abstract class AbstractFacade<T> {
     
     //For operational data (take or leave bike, bookings, balance...), no checks needed
     public String editOperationalBikeUser(T entity) {
+        Bikeuser b = (Bikeuser) entity;
         getEntityManager().merge(entity);
-        return RESPONSE_OK;
+        return String.format(RESPONSE_OK, b.getEntityid());
     }
     
     //For basic data (username, mail...) checks needed
     public String editBasicBikeUser(T entity) {
-        Bikeuser bikeuser = (Bikeuser) entity;
+        Bikeuser b = (Bikeuser) entity;
         //Check if the username or email are availables
-        if(isUsernameUpdatable(bikeuser) && isEmailUpdatable(bikeuser)) {
+        if(isUsernameUpdatable(b) && isEmailUpdatable(b)) {
             getEntityManager().merge(entity);
-            return RESPONSE_OK;
+            return String.format(RESPONSE_OK, b.getEntityid());
         }
         
-        return RESPONSE_KO;
+        return String.format(RESPONSE_KO, b.getEntityid());
     }
     
     //Check if username is available for update

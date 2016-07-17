@@ -1,16 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -21,35 +18,32 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
 @Entity
 @Table(name = "bikestation")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Bikestation.findAll", query = "SELECT b FROM Bikestation b"),
-    @NamedQuery(name = "Bikestation.findById", query = "SELECT b FROM Bikestation b WHERE b.serverId = :id"),
+    @NamedQuery(name = "Bikestation.findById", query = "SELECT b FROM Bikestation b WHERE b.id = :id"),
     @NamedQuery(name = "Bikestation.findByAddress", query = "SELECT b FROM Bikestation b WHERE b.address = :address"),
-    @NamedQuery(name = "Bikestation.findByTotal", query = "SELECT b FROM Bikestation b WHERE b.total = :total"),
-    @NamedQuery(name = "Bikestation.findByAvailable", query = "SELECT b FROM Bikestation b WHERE b.available = :available"),
-    @NamedQuery(name = "Bikestation.findByBroken", query = "SELECT b FROM Bikestation b WHERE b.broken = :broken"),
-    @NamedQuery(name = "Bikestation.findByReserved", query = "SELECT b FROM Bikestation b WHERE b.reserved = :reserved"),
+    @NamedQuery(name = "Bikestation.findByTotalmoorings", query = "SELECT b FROM Bikestation b WHERE b.totalmoorings = :totalmoorings"),
+    @NamedQuery(name = "Bikestation.findByReservedmoorings", query = "SELECT b FROM Bikestation b WHERE b.reservedmoorings = :reservedmoorings"),
+    @NamedQuery(name = "Bikestation.findByAvailablebikes", query = "SELECT b FROM Bikestation b WHERE b.availablebikes = :availablebikes"),
+    @NamedQuery(name = "Bikestation.findByReservedbikes", query = "SELECT b FROM Bikestation b WHERE b.reservedbikes = :reservedbikes"),
     @NamedQuery(name = "Bikestation.findByLatitude", query = "SELECT b FROM Bikestation b WHERE b.latitude = :latitude"),
     @NamedQuery(name = "Bikestation.findByLongitude", query = "SELECT b FROM Bikestation b WHERE b.longitude = :longitude"),
     @NamedQuery(name = "Bikestation.findByMd5", query = "SELECT b FROM Bikestation b WHERE b.md5 = :md5"),
-    @NamedQuery(name = "Bikestation.findByTimestampBike", query = "SELECT b FROM Bikestation b WHERE b.timestampBike = :timestampBike"),
-    
-    @NamedQuery(name = "Bikestation.getAvailable", query = "SELECT b.available FROM Bikestation b WHERE b.serverId = :id"),
-    @NamedQuery(name = "Bikestation.getBroken", query = "SELECT b.broken FROM Bikestation b WHERE b.serverId = :id"),
-    @NamedQuery(name = "Bikestation.getReserved", query = "SELECT b.reserved FROM Bikestation b WHERE b.serverId = :id"),
-    @NamedQuery(name = "Bikestation.getTotal", query = "SELECT b.total FROM Bikestation b WHERE b.serverId = :id")})
-
+    @NamedQuery(name = "Bikestation.findByChangetimestamp", query = "SELECT b FROM Bikestation b WHERE b.changetimestamp = :changetimestamp"),
+    @NamedQuery(name = "Bikestation.findByBasicfare", query = "SELECT b FROM Bikestation b WHERE b.basicfare = :basicfare"),
+    @NamedQuery(name = "Bikestation.findByEntityid", query = "SELECT b FROM Bikestation b WHERE b.entityid = :entityid")})
 public class Bikestation implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
-    @NotNull
     @Column(name = "id")
-    private Integer serverId;
+    private Integer id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -57,20 +51,20 @@ public class Bikestation implements Serializable {
     private String address;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "total")
-    private int total;
+    @Column(name = "totalmoorings")
+    private int totalmoorings;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "available")
-    private int available;
+    @Column(name = "reservedmoorings")
+    private int reservedmoorings;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "broken")
-    private int broken;
+    @Column(name = "availablebikes")
+    private int availablebikes;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "reserved")
-    private int reserved;
+    @Column(name = "reservedbikes")
+    private int reservedbikes;
     @Basic(optional = false)
     @NotNull
     @Column(name = "latitude")
@@ -79,182 +73,167 @@ public class Bikestation implements Serializable {
     @NotNull
     @Column(name = "longitude")
     private float longitude;
-    @Size(max = 32)
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 32)
     @Column(name = "md5")
     private String md5;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "timestampBike")
+    @Column(name = "changetimestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timestampBike;
+    private Date changetimestamp;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "basicfare")
+    private float basicfare;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 45)
+    @Column(name = "entityid")
+    private String entityid;
 
     public Bikestation() {
     }
 
-    public Bikestation(Integer serverId) {
-        this.serverId = serverId;
+    public Bikestation(Integer id) {
+        this.id = id;
     }
 
-    public Bikestation(Integer serverId, String address, int total, int available, int broken, int reserved, float latitude, float longitude, Date timestamp) {
-        this.serverId = serverId;
+    public Bikestation(Integer id, String address, int totalmoorings, int reservedmoorings, int availablebikes, int reservedbikes, float latitude, float longitude, String md5, Date changetimestamp, float basicfare, String entityid) {
+        this.id = id;
         this.address = address;
-        this.total = total;
-        this.available = available;
-        this.broken = broken;
-        this.reserved = reserved;
+        this.totalmoorings = totalmoorings;
+        this.reservedmoorings = reservedmoorings;
+        this.availablebikes = availablebikes;
+        this.reservedbikes = reservedbikes;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.timestampBike = timestamp;
+        this.md5 = md5;
+        this.changetimestamp = changetimestamp;
+        this.basicfare = basicfare;
+        this.entityid = entityid;
     }
 
-    //<editor-fold defaultstate="collapsed" desc="GETTERS & SETTERS">
-    public Integer getServerId() {
-        return serverId;
+    public Integer getId() {
+        return id;
     }
-    
-    public void setServerId(Integer serverId) {
-        this.serverId = serverId;
+
+    public void setId(Integer id) {
+        this.id = id;
     }
-    
+
     public String getAddress() {
         return address;
     }
-    
+
     public void setAddress(String address) {
         this.address = address;
     }
-    
-    public int getTotal() {
-        return total;
+
+    public int getTotalmoorings() {
+        return totalmoorings;
     }
-    
-    public void setTotal(int total) {
-        this.total = total;
+
+    public void setTotalmoorings(int totalmoorings) {
+        this.totalmoorings = totalmoorings;
     }
-    
-    public int getAvailable() {
-        return available;
+
+    public int getReservedmoorings() {
+        return reservedmoorings;
     }
-    
-    public void setAvailable(int available) {
-        this.available = available;
+
+    public void setReservedmoorings(int reservedmoorings) {
+        this.reservedmoorings = reservedmoorings;
     }
-    
-    public int getBroken() {
-        return broken;
+
+    public int getAvailablebikes() {
+        return availablebikes;
     }
-    
-    public void setBroken(int broken) {
-        this.broken = broken;
+
+    public void setAvailablebikes(int availablebikes) {
+        this.availablebikes = availablebikes;
     }
-    
-    public int getReserved() {
-        return reserved;
+
+    public int getReservedbikes() {
+        return reservedbikes;
     }
-    
-    public void setReserved(int reserved) {
-        this.reserved = reserved;
+
+    public void setReservedbikes(int reservedbikes) {
+        this.reservedbikes = reservedbikes;
     }
-    
+
     public float getLatitude() {
         return latitude;
     }
-    
+
     public void setLatitude(float latitude) {
         this.latitude = latitude;
     }
-    
+
     public float getLongitude() {
         return longitude;
     }
-    
+
     public void setLongitude(float longitude) {
         this.longitude = longitude;
     }
-    
+
     public String getMd5() {
         return md5;
     }
-    
+
     public void setMd5(String md5) {
         this.md5 = md5;
     }
-    
-    public Date getTimestampBike() {
-        return timestampBike;
-    }
-    
-    public void setTimestampBike(Date timestampBike) {
-        this.timestampBike = timestampBike;
-    }
-//</editor-fold>
 
-    //<editor-fold defaultstate="collapsed" desc="EQUALS & HASHCODE">
+    public Date getChangetimestamp() {
+        return changetimestamp;
+    }
+
+    public void setChangetimestamp(Date changetimestamp) {
+        this.changetimestamp = changetimestamp;
+    }
+
+    public float getBasicfare() {
+        return basicfare;
+    }
+
+    public void setBasicfare(float basicfare) {
+        this.basicfare = basicfare;
+    }
+
+    public String getEntityid() {
+        return entityid;
+    }
+
+    public void setEntityid(String entityid) {
+        this.entityid = entityid;
+    }
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 73 * hash + Objects.hashCode(this.serverId);
-        hash = 73 * hash + Objects.hashCode(this.address);
-        hash = 73 * hash + this.total;
-        hash = 73 * hash + this.available;
-        hash = 73 * hash + this.broken;
-        hash = 73 * hash + this.reserved;
-        hash = 73 * hash + Float.floatToIntBits(this.latitude);
-        hash = 73 * hash + Float.floatToIntBits(this.longitude);
-        hash = 73 * hash + Objects.hashCode(this.md5);
-        hash = 73 * hash + Objects.hashCode(this.timestampBike);
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
-    
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof Bikestation)) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Bikestation other = (Bikestation) obj;
-        if (this.total != other.total) {
-            return false;
-        }
-        if (this.available != other.available) {
-            return false;
-        }
-        if (this.broken != other.broken) {
-            return false;
-        }
-        if (this.reserved != other.reserved) {
-            return false;
-        }
-        if (Float.floatToIntBits(this.latitude) != Float.floatToIntBits(other.latitude)) {
-            return false;
-        }
-        if (Float.floatToIntBits(this.longitude) != Float.floatToIntBits(other.longitude)) {
-            return false;
-        }
-        if (!Objects.equals(this.address, other.address)) {
-            return false;
-        }
-        if (!Objects.equals(this.md5, other.md5)) {
-            return false;
-        }
-        if (!Objects.equals(this.serverId, other.serverId)) {
-            return false;
-        }
-        if (!Objects.equals(this.timestampBike, other.timestampBike)) {
+        Bikestation other = (Bikestation) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
         return true;
     }
-//</editor-fold>
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "entities.Bikestation[ id=" + id + " ]";
+    }
     
 }
-
-   
