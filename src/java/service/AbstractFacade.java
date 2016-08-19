@@ -80,15 +80,15 @@ public abstract class AbstractFacade<T> {
         int availableBikes = b.getAvailablebikes();
        
         if(op.equals(OP_TAKE)) //If I'm taking a bike, I need at least 1 available
-            isStatusOk = availableBikes > 0;
+            isStatusOk = (availableBikes + 1) > 0; //+1 because the value comes updated form the app with a -1, necessary to check limit conditions
         else { //leaving bike, free moorings needed          
             int totalMoorings = b.getTotalmoorings();
             int reservedBikes = b.getReservedbikes();
             int reservedMoorings = b.getReservedmoorings();
             
-            int availableMoorings = totalMoorings - availableBikes - reservedBikes - reservedMoorings;
+            int availableMoorings = totalMoorings - availableBikes - reservedBikes - reservedMoorings + 1; //Because the value comes updated form the app, necessary to check limit conditions
             
-            isStatusOk = availableMoorings > 0;
+            isStatusOk = availableMoorings > 0; 
         }
         
         if(isStatusOk) {
