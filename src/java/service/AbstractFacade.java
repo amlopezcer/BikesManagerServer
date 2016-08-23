@@ -67,28 +67,29 @@ public abstract class AbstractFacade<T> {
      */
     
     // Edit for the Bikestation (taking and leaving bikes)
-    public String editBikeStation(T entity, String op) {
+    public String editBikeStation(T entity, String operation) {
         /**
          * Same string as in the app, to confirm the op which is being processed, 
          * no need of a "leave" one because it is an if - else staetment
          */
         final String OP_TAKE = "take";
+        final String OP_LEAVE = "leave";
+        final String OP_BOOK_BIKE = "book_bike";
+        final String OP_BOOK_MOORINGS = "book_moorings";
         
         Bikestation b = (Bikestation) entity;
-        boolean isStatusOk;
+        boolean isStatusOk = false;
+        int availableMoorings =  b.getTotalmoorings() - b.getAvailablebikes() -  b.getReservedbikes() - b.getReservedmoorings() + 1; //Because the value comes updated form the app, necessary to check limit conditions
         
-        int availableBikes = b.getAvailablebikes();
-       
-        if(op.equals(OP_TAKE)) //If I'm taking a bike, I need at least 1 available
-            isStatusOk = (availableBikes + 1) > 0; //+1 because the value comes updated form the app with a -1, necessary to check limit conditions
-        else { //leaving bike, free moorings needed          
-            int totalMoorings = b.getTotalmoorings();
-            int reservedBikes = b.getReservedbikes();
-            int reservedMoorings = b.getReservedmoorings();
-            
-            int availableMoorings = totalMoorings - availableBikes - reservedBikes - reservedMoorings + 1; //Because the value comes updated form the app, necessary to check limit conditions
-            
-            isStatusOk = availableMoorings > 0; 
+        switch (operation) {
+            case OP_TAKE:
+            case OP_BOOK_BIKE: //To take or book bikes requires the same condition
+                isStatusOk = (b.getAvailablebikes() + 1) > 0; //+1 because the value comes updated form the app with a -1, necessary to check limit conditions
+                break;
+            case OP_LEAVE:
+            case OP_BOOK_MOORINGS: //Same as before, same condition
+                isStatusOk = availableMoorings > 0;
+                break;
         }
         
         if(isStatusOk) {
