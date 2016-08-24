@@ -63,10 +63,14 @@ public abstract class AbstractFacade<T> {
     }
     
     /**
-     * Customize methods
+     * *****************
+     * Custom methods
+     * 
+     * BikeStation
+     * *****************
      */
     
-    // Edit for the Bikestation (taking and leaving bikes)
+    // Edit for the Bikestation (taking, leaving bikes...)
     public String editBikeStation(T entity, String operation) {
         /**
          * Same string as in the app, to confirm the op which is being processed, 
@@ -99,6 +103,37 @@ public abstract class AbstractFacade<T> {
         
         return String.format(RESPONSE_KO, b.getEntityid());
     }
+    
+    public String editBasicBikeStation(T entity) {
+        Bikestation b = (Bikestation) entity;
+        getEntityManager().merge(entity);
+        return String.format(RESPONSE_OK, b.getEntityid());
+    }
+    
+    //Return a bike station object found by the address
+    public Bikestation findByStationAddress(String address) {
+        String addressAux = address.replaceAll("_", " "); //" " come as "_" from the app to avoid issues with urls
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikestation.findByAddress", Bikestation.class);
+        query.setParameter("address", addressAux);
+        
+        try {
+            Bikestation b = (Bikestation) query.getSingleResult();
+            return b;
+        } catch(Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * *****************
+     * Custom methods
+     * 
+     * BikeUser
+     * *****************
+     */
     
     //Custom user creator (just to assign a correct user server ID)
     public String createNewUser(T entity) { 
@@ -161,6 +196,7 @@ public abstract class AbstractFacade<T> {
         return newID + 1;
     }
     
+    //Return a user object found by the username
     public Bikeuser findByUsername(String username) {
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Bikeuser.findByUsername", Bikeuser.class);

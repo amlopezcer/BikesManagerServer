@@ -38,8 +38,9 @@ public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
     @PUT
     @Path("{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void edit(@PathParam("id") Integer id, Bikestation entity) {
-        super.edit(entity);
+    @Produces(MediaType.APPLICATION_JSON)
+    public String edit(@PathParam("id") Integer id, Bikestation entity) {
+        return super.editBasicBikeStation(entity);
     }
     
     @PUT
@@ -61,6 +62,15 @@ public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
     @Produces(MediaType.APPLICATION_JSON)
     public Bikestation find(@PathParam("id") Integer id) {
         return super.find(id);
+    }
+    
+    //A custom find by address
+    @GET
+    @Override
+    @Path("stationAddress/{address}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Bikestation findByStationAddress(@PathParam("address") String address) {
+        return super.findByStationAddress(address);
     }
 
     @GET
