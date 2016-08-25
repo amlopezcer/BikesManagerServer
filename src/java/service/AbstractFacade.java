@@ -3,6 +3,7 @@ package service;
 
 import entities.Bikestation;
 import entities.Bikeuser;
+import entities.Booking;
 import java.util.List;
 import java.util.Objects;
 import javax.persistence.EntityManager;
@@ -61,6 +62,42 @@ public abstract class AbstractFacade<T> {
         javax.persistence.Query q = getEntityManager().createQuery(cq);
         return ((Long) q.getSingleResult()).intValue();
     }
+    
+    /**
+     * *****************
+     * Custom methods
+     * 
+     * Booking
+     * *****************
+     */
+    
+    //Custom booking creator (just to assign a correct user server ID)
+    public String createNewBooking(T entity) { 
+        Booking b = (Booking) entity;      
+        b.setId(getNewBookingID());
+        getEntityManager().persist(entity);
+        return String.format(RESPONSE_OK, b.getEntityid());
+    }
+    
+    //Getting a new user ID from the server (the highest)
+    private int getNewBookingID() {
+        List<Booking> bookingList = (List<Booking>) findAll(); //getting the booking list
+        
+        if (bookingList.isEmpty())
+            return 1;
+        
+        int currentID; 
+        int newID = bookingList.get(0).getId();
+        
+        for(Booking booking: bookingList) {
+            currentID = booking.getId();
+            if(currentID > newID)
+                newID = currentID;
+        }
+        
+        return newID + 1;
+    }
+    
     
     /**
      * *****************

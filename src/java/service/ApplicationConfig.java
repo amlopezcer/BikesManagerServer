@@ -22,6 +22,7 @@ public class ApplicationConfig extends Application {
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(service.BikestationFacadeREST.class);
         resources.add(service.BikeuserFacadeREST.class);
+        resources.add(service.BookingFacadeREST.class);
     }
     
 }
