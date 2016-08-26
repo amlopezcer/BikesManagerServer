@@ -48,6 +48,13 @@ public class BookingFacadeREST extends AbstractFacade<Booking> {
     public void remove(@PathParam("id") Integer id) {
         super.remove(super.find(id));
     }
+    
+    @DELETE
+    @Path("{username}/{bookingType}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public synchronized String edit(@PathParam("username") String username, @PathParam("bookingType") Integer bookingType) {
+        return super.deleteBookingByUsername(username, bookingType);
+    }
 
     @GET
     @Path("{id}")

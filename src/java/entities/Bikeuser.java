@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Bikeuser.findAll", query = "SELECT b FROM Bikeuser b"),
+    @NamedQuery(name = "Bikeuser.updateTimedOutBookings", query = "UPDATE Bikeuser b SET b.booktaken = :booktaken, b.mooringstaken = :mooringstaken WHERE b.id = :id"),
     @NamedQuery(name = "Bikeuser.findById", query = "SELECT b FROM Bikeuser b WHERE b.id = :id"),
     @NamedQuery(name = "Bikeuser.findByUsername", query = "SELECT b FROM Bikeuser b WHERE b.username = :username"),
     @NamedQuery(name = "Bikeuser.findByPassword", query = "SELECT b FROM Bikeuser b WHERE b.password = :password"),
@@ -283,6 +284,28 @@ public class Bikeuser implements Serializable {
 
     public void setEntityid(String entityid) {
         this.entityid = entityid;
+    }
+    
+    public void cancelBikeBooking() {
+        booktaken = false;
+    }
+    
+    public void cancelMooringsBooking() {
+        mooringstaken = false;
+    }
+    
+    public boolean isBikeBookingTimedOut(){
+        long now = System.currentTimeMillis();
+        long remainingTime = Booking.MAX_BOOKING_TIME - (now - bookdate.getTime());
+      
+        return booktaken && (remainingTime <= 0);
+    }
+    
+    public boolean isMooringsBookingTimedOut(){
+        long now = System.currentTimeMillis();
+        long remainingTime = Booking.MAX_BOOKING_TIME - (now - mooringsdate.getTime());
+      
+        return mooringstaken && (remainingTime <= 0);
     }
     
 }

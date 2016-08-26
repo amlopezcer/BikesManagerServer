@@ -6,7 +6,11 @@
 package entities;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,6 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Booking.findAll", query = "SELECT b FROM Booking b"),
+    @NamedQuery(name = "Booking.deleteById", query = "DELETE FROM Booking b WHERE b.id = :id"),
     @NamedQuery(name = "Booking.findById", query = "SELECT b FROM Booking b WHERE b.id = :id"),
     @NamedQuery(name = "Booking.findByBookaddress", query = "SELECT b FROM Booking b WHERE b.bookaddress = :bookaddress"),
     @NamedQuery(name = "Booking.findByBookdate", query = "SELECT b FROM Booking b WHERE b.bookdate = :bookdate"),
@@ -39,6 +44,10 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Booking.findByEntityid", query = "SELECT b FROM Booking b WHERE b.entityid = :entityid"),
     @NamedQuery(name = "Booking.findByMd5", query = "SELECT b FROM Booking b WHERE b.md5 = :md5")})
 public class Booking implements Serializable {
+    
+    public static final int MAX_BOOKING_TIME = 60000; //1800000; //30'
+    public static final int BOOKING_TYPE_BIKE = 1; //To identify the booking type
+    public static final int BOOKING_TYPE_MOORINGS = 2; //To identify the booking type
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -173,5 +182,13 @@ public class Booking implements Serializable {
     public String toString() {
         return "entities.Booking[ id=" + id + " ]";
     }
+    
+    public long getRemainingBookingTime() {
+        long now = System.currentTimeMillis();
+
+        return MAX_BOOKING_TIME - (now - bookdate.getTime());
+    }
+    
+    
     
 }

@@ -77,7 +77,8 @@ public class BikestationFacadeREST extends AbstractFacade<Bikestation> {
     @Override
     @Produces(MediaType.APPLICATION_JSON)
     public List<Bikestation> findAll() {
-        return super.findAll();
+        //return super.findAll();
+        return super.findAllWithoutTimedOutBookings();
     }
 
     @GET

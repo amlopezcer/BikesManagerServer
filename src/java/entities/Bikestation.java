@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Bikestation.findAll", query = "SELECT b FROM Bikestation b"),
+    @NamedQuery(name = "Bikestation.updateTimedOutBookings", query = "UPDATE Bikestation b SET b.reservedmoorings = :reservedmoorings, b.reservedbikes = :reservedbikes, b.availablebikes = :availablebikes WHERE b.id = :id"),
     @NamedQuery(name = "Bikestation.findById", query = "SELECT b FROM Bikestation b WHERE b.id = :id"),
     @NamedQuery(name = "Bikestation.findByAddress", query = "SELECT b FROM Bikestation b WHERE b.address = :address"),
     @NamedQuery(name = "Bikestation.findByTotalmoorings", query = "SELECT b FROM Bikestation b WHERE b.totalmoorings = :totalmoorings"),
@@ -234,6 +235,38 @@ public class Bikestation implements Serializable {
     @Override
     public String toString() {
         return "entities.Bikestation[ id=" + id + " ]";
+    }
+    
+    public boolean isBikeStationUpdatable(String operation) {
+        final String OP_TAKE = "take";
+        final String OP_LEAVE = "leave";
+        final String OP_BOOK_BIKE = "book_bike";
+        final String OP_BOOK_MOORINGS = "book_moorings";
+        
+        boolean isUpdatable = false;
+        int availableMoorings =  totalmoorings - availablebikes -  reservedbikes - reservedmoorings + 1; //Because the value comes updated form the app, necessary to check limit conditions
+        
+        switch (operation) {
+            case OP_TAKE:
+            case OP_BOOK_BIKE: //To take or book bikes requires the same condition
+                isUpdatable = availablebikes + 1 > 0; //+1 because the value comes updated form the app with a -1, necessary to check limit conditions
+                break;
+            case OP_LEAVE:
+            case OP_BOOK_MOORINGS: //Same as before, same condition
+                isUpdatable = availableMoorings > 0;
+                break;
+        }
+        
+        return isUpdatable;
+    }
+    
+    public void cancelBikeBooking() {
+        availablebikes++;
+        reservedbikes--;
+    }
+    
+    public void cancelMooringsBooking() {
+        reservedmoorings--;
     }
     
 }

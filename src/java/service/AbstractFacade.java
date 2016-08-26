@@ -73,10 +73,10 @@ public abstract class AbstractFacade<T> {
     
     //Custom booking creator (just to assign a correct user server ID)
     public String createNewBooking(T entity) { 
-        Booking b = (Booking) entity;      
-        b.setId(getNewBookingID());
+        Booking booking = (Booking) entity;      
+        booking.setId(getNewBookingID());
         getEntityManager().persist(entity);
-        return String.format(RESPONSE_OK, b.getEntityid());
+        return String.format(RESPONSE_OK, booking.getEntityid());
     }
     
     //Getting a new user ID from the server (the highest)
@@ -98,6 +98,24 @@ public abstract class AbstractFacade<T> {
         return newID + 1;
     }
     
+    public String deleteBookingByUsername(String username, Integer bookingType) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Booking.findByUsername", Booking.class);
+        query.setParameter("username", username);
+        List<Booking> bookingList = query.getResultList(); //An user can have 2 bookings (bike and moorings)
+        
+        String response = "";
+        
+        for(Booking currentBooking: bookingList) {
+            if(currentBooking.getBooktype() == bookingType) {
+                deleteBooking(currentBooking);
+                response = String.format(RESPONSE_OK, currentBooking.getEntityid());
+            }
+        }
+        
+        return response;
+    }
+    
     
     /**
      * *****************
@@ -107,44 +125,86 @@ public abstract class AbstractFacade<T> {
      * *****************
      */
     
+    public List<T> findAllWithoutTimedOutBookings() {
+        //Get booking list 
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Booking.findAll", Booking.class);
+        List<Booking> bookingList = query.getResultList();
+        
+        if(!bookingList.isEmpty()) {
+            for(Booking currentBooking : bookingList) {
+                //Look for timed out bookings
+                if(currentBooking.getRemainingBookingTime() <= 0) {
+                    //Delete the booking and update station and user affected
+                    deleteBooking(currentBooking);
+                    updateStationWithoutTimedOutBookings(currentBooking);
+                    updateUserWithoutTimedOutBookings(currentBooking);
+                }
+            }
+        }
+         
+        //Standard findAll
+        javax.persistence.criteria.CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
+        cq.select(cq.from(entityClass));
+        return getEntityManager().createQuery(cq).getResultList();
+    }
+    
+    private void deleteBooking(Booking booking) {
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Booking.deleteById", Booking.class);
+        query.setParameter("id", booking.getId());
+        query.executeUpdate(); 
+    }
+    
+    private void updateStationWithoutTimedOutBookings(Booking timedOutBooking) {
+        Bikestation bikeStation = findByStationAddress(timedOutBooking.getBookaddress());
+                    
+        if(timedOutBooking.getBooktype() == Booking.BOOKING_TYPE_BIKE) {
+            bikeStation.cancelBikeBooking();
+        } else
+            bikeStation.cancelMooringsBooking();
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikestation.updateTimedOutBookings", Bikestation.class);                  
+        query.setParameter("reservedmoorings", bikeStation.getReservedmoorings());
+        query.setParameter("reservedbikes", bikeStation.getReservedbikes());
+        query.setParameter("availablebikes", bikeStation.getAvailablebikes());
+        query.setParameter("id", bikeStation.getId());
+        query.executeUpdate();  
+    }
+    
+    private void updateUserWithoutTimedOutBookings(Booking timedOutBooking) {
+        Bikeuser bikeuser = findByUsername(timedOutBooking.getUsername());
+                    
+        if(timedOutBooking.getBooktype() == Booking.BOOKING_TYPE_BIKE) {
+            bikeuser.cancelBikeBooking();
+        } else
+            bikeuser.cancelMooringsBooking();
+        
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikeuser.updateTimedOutBookings", Bikeuser.class);                  
+        query.setParameter("booktaken", bikeuser.getBooktaken());
+        query.setParameter("mooringstaken", bikeuser.getMooringstaken());
+        query.setParameter("id", bikeuser.getId());
+        query.executeUpdate();  
+    }
+    
     // Edit for the Bikestation (taking, leaving bikes...)
-    public String editBikeStation(T entity, String operation) {
-        /**
-         * Same string as in the app, to confirm the op which is being processed, 
-         * no need of a "leave" one because it is an if - else staetment
-         */
-        final String OP_TAKE = "take";
-        final String OP_LEAVE = "leave";
-        final String OP_BOOK_BIKE = "book_bike";
-        final String OP_BOOK_MOORINGS = "book_moorings";
+    public String editBikeStation(T entity, String operation) {        
+        Bikestation bikeStation = (Bikestation) entity;
         
-        Bikestation b = (Bikestation) entity;
-        boolean isStatusOk = false;
-        int availableMoorings =  b.getTotalmoorings() - b.getAvailablebikes() -  b.getReservedbikes() - b.getReservedmoorings() + 1; //Because the value comes updated form the app, necessary to check limit conditions
-        
-        switch (operation) {
-            case OP_TAKE:
-            case OP_BOOK_BIKE: //To take or book bikes requires the same condition
-                isStatusOk = (b.getAvailablebikes() + 1) > 0; //+1 because the value comes updated form the app with a -1, necessary to check limit conditions
-                break;
-            case OP_LEAVE:
-            case OP_BOOK_MOORINGS: //Same as before, same condition
-                isStatusOk = availableMoorings > 0;
-                break;
-        }
-        
-        if(isStatusOk) {
+        if(bikeStation.isBikeStationUpdatable(operation)){
             getEntityManager().merge(entity);
-            return String.format(RESPONSE_OK, b.getEntityid());
+            return String.format(RESPONSE_OK, bikeStation.getEntityid());
         }
         
-        return String.format(RESPONSE_KO, b.getEntityid());
+        return String.format(RESPONSE_KO, bikeStation.getEntityid());
     }
     
     public String editBasicBikeStation(T entity) {
-        Bikestation b = (Bikestation) entity;
+        Bikestation bikeStation = (Bikestation) entity;
         getEntityManager().merge(entity);
-        return String.format(RESPONSE_OK, b.getEntityid());
+        return String.format(RESPONSE_OK, bikeStation.getEntityid());
     }
     
     //Return a bike station object found by the address
@@ -156,8 +216,8 @@ public abstract class AbstractFacade<T> {
         query.setParameter("address", addressAux);
         
         try {
-            Bikestation b = (Bikestation) query.getSingleResult();
-            return b;
+            Bikestation bikeStation = (Bikestation) query.getSingleResult();
+            return bikeStation;
         } catch(Exception e) {
             System.out.println(e.getLocalizedMessage());
             return null;
@@ -172,17 +232,18 @@ public abstract class AbstractFacade<T> {
      * *****************
      */
     
+    
     //Custom user creator (just to assign a correct user server ID)
     public String createNewUser(T entity) { 
-        Bikeuser b = (Bikeuser) entity;
+        Bikeuser bikeUser = (Bikeuser) entity;
         //Check if the username or email are availables
-        if(isUsernameAvailable(b.getUsername()) && isEmailAvailable(b.getEmail())) {
-            b.setId(getNewUserID());
+        if(isUsernameAvailable(bikeUser.getUsername()) && isEmailAvailable(bikeUser.getEmail())) {
+            bikeUser.setId(getNewUserID());
             getEntityManager().persist(entity);
-            return String.format(RESPONSE_OK, b.getEntityid());
+            return String.format(RESPONSE_OK, bikeUser.getEntityid());
         }
         
-        return String.format(RESPONSE_KO, b.getEntityid());
+        return String.format(RESPONSE_KO, bikeUser.getEntityid());
     }
     
     //Checking if the username is available
@@ -192,7 +253,7 @@ public abstract class AbstractFacade<T> {
         query.setParameter("username", username);
         
         try {
-            Bikeuser b = (Bikeuser) query.getSingleResult(); //Needed to generate the following exception
+            Bikeuser bikeUser = (Bikeuser) query.getSingleResult(); //Needed to generate the following exception
             return false;
         } catch(Exception e) {
             System.out.println(e.getLocalizedMessage());
@@ -233,38 +294,52 @@ public abstract class AbstractFacade<T> {
         return newID + 1;
     }
     
-    //Return a user object found by the username
+    //Return a user object found by the username with its timed out bookings cleared
     public Bikeuser findByUsername(String username) {
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Bikeuser.findByUsername", Bikeuser.class);
         query.setParameter("username", username);
-        
-        try {
-            Bikeuser b = (Bikeuser) query.getSingleResult();
-            return b;
-        } catch(Exception e) {
-            System.out.println(e.getLocalizedMessage());
-            return null;
+
+        Bikeuser bikeUser = (Bikeuser) query.getSingleResult();
+        boolean updateUser = false;
+        if(bikeUser.isBikeBookingTimedOut()) {
+            bikeUser.cancelBikeBooking();
+            updateUser = true;
         }
+                
+        if(bikeUser.isMooringsBookingTimedOut()) {
+            bikeUser.cancelMooringsBooking();
+            updateUser = true;
+        }
+        
+        if(updateUser) {
+            query = em.createNamedQuery("Bikeuser.updateTimedOutBookings", Bikeuser.class);                  
+            query.setParameter("booktaken", bikeUser.getBooktaken());
+            query.setParameter("mooringstaken", bikeUser.getMooringstaken());
+            query.setParameter("id", bikeUser.getId());
+            query.executeUpdate();
+        }
+        
+        return bikeUser;
     }
     
     //For operational data (take or leave bike, bookings, balance...), no checks needed
     public String editOperationalBikeUser(T entity) {
-        Bikeuser b = (Bikeuser) entity;
+        Bikeuser bikeUser = (Bikeuser) entity;
         getEntityManager().merge(entity);
-        return String.format(RESPONSE_OK, b.getEntityid());
+        return String.format(RESPONSE_OK, bikeUser.getEntityid());
     }
     
     //For basic data (username, mail...) checks needed
     public String editBasicBikeUser(T entity) {
-        Bikeuser b = (Bikeuser) entity;
+        Bikeuser bikeUser = (Bikeuser) entity;
         //Check if the username or email are availables
-        if(isUsernameUpdatable(b) && isEmailUpdatable(b)) {
+        if(isUsernameUpdatable(bikeUser) && isEmailUpdatable(bikeUser)) {
             getEntityManager().merge(entity);
-            return String.format(RESPONSE_OK, b.getEntityid());
+            return String.format(RESPONSE_OK, bikeUser.getEntityid());
         }
         
-        return String.format(RESPONSE_KO, b.getEntityid());
+        return String.format(RESPONSE_KO, bikeUser.getEntityid());
     }
     
     //Check if username is available for update
