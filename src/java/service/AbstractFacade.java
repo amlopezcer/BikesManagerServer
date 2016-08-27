@@ -135,10 +135,9 @@ public abstract class AbstractFacade<T> {
             for(Booking currentBooking : bookingList) {
                 //Look for timed out bookings
                 if(currentBooking.getRemainingBookingTime() <= 0) {
-                    //Delete the booking and update station and user affected
+                    //Delete the booking and update station affected
                     deleteBooking(currentBooking);
                     updateStationWithoutTimedOutBookings(currentBooking);
-                    updateUserWithoutTimedOutBookings(currentBooking);
                 }
             }
         }
@@ -170,22 +169,6 @@ public abstract class AbstractFacade<T> {
         query.setParameter("reservedbikes", bikeStation.getReservedbikes());
         query.setParameter("availablebikes", bikeStation.getAvailablebikes());
         query.setParameter("id", bikeStation.getId());
-        query.executeUpdate();  
-    }
-    
-    private void updateUserWithoutTimedOutBookings(Booking timedOutBooking) {
-        Bikeuser bikeuser = findByUsername(timedOutBooking.getUsername());
-                    
-        if(timedOutBooking.getBooktype() == Booking.BOOKING_TYPE_BIKE) {
-            bikeuser.cancelBikeBooking();
-        } else
-            bikeuser.cancelMooringsBooking();
-        
-        EntityManager em = getEntityManager();
-        Query query = em.createNamedQuery("Bikeuser.updateTimedOutBookings", Bikeuser.class);                  
-        query.setParameter("booktaken", bikeuser.getBooktaken());
-        query.setParameter("mooringstaken", bikeuser.getMooringstaken());
-        query.setParameter("id", bikeuser.getId());
         query.executeUpdate();  
     }
     

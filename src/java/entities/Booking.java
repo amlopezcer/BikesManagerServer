@@ -189,6 +189,4 @@ public class Booking implements Serializable {
         return MAX_BOOKING_TIME - (now - bookdate.getTime());
     }
     
-    
-    
 }
