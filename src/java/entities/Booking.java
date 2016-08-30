@@ -26,10 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- *
- * @author USUARIO
- */
+
 @Entity
 @Table(name = "booking")
 @XmlRootElement
@@ -45,7 +42,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Booking.findByMd5", query = "SELECT b FROM Booking b WHERE b.md5 = :md5")})
 public class Booking implements Serializable {
     
-    public static final int MAX_BOOKING_TIME = 60000; //1800000; //30'
+    public static final int MAX_BOOKING_TIME = 1800000; //30'
     public static final int BOOKING_TYPE_BIKE = 1; //To identify the booking type
     public static final int BOOKING_TYPE_MOORINGS = 2; //To identify the booking type
 
