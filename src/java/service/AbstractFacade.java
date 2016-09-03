@@ -282,28 +282,33 @@ public abstract class AbstractFacade<T> {
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Bikeuser.findByUsername", Bikeuser.class);
         query.setParameter("username", username);
+        
+        try {
+            Bikeuser bikeUser = (Bikeuser) query.getSingleResult();
+            boolean updateUser = false;
+            if(bikeUser.isBikeBookingTimedOut()) {
+                bikeUser.cancelBikeBooking();
+                updateUser = true;
+            }
 
-        Bikeuser bikeUser = (Bikeuser) query.getSingleResult();
-        boolean updateUser = false;
-        if(bikeUser.isBikeBookingTimedOut()) {
-            bikeUser.cancelBikeBooking();
-            updateUser = true;
+            if(bikeUser.isMooringsBookingTimedOut()) {
+                bikeUser.cancelMooringsBooking();
+                updateUser = true;
+            }
+
+            if(updateUser) {
+                query = em.createNamedQuery("Bikeuser.updateTimedOutBookings", Bikeuser.class);                  
+                query.setParameter("booktaken", bikeUser.getBooktaken());
+                query.setParameter("mooringstaken", bikeUser.getMooringstaken());
+                query.setParameter("id", bikeUser.getId());
+                query.executeUpdate();
+            }
+
+            return bikeUser;
+        } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
+            return null;
         }
-                
-        if(bikeUser.isMooringsBookingTimedOut()) {
-            bikeUser.cancelMooringsBooking();
-            updateUser = true;
-        }
-        
-        if(updateUser) {
-            query = em.createNamedQuery("Bikeuser.updateTimedOutBookings", Bikeuser.class);                  
-            query.setParameter("booktaken", bikeUser.getBooktaken());
-            query.setParameter("mooringstaken", bikeUser.getMooringstaken());
-            query.setParameter("id", bikeUser.getId());
-            query.executeUpdate();
-        }
-        
-        return bikeUser;
     }
     
     //For operational data (take or leave bike, bookings, balance...), no checks needed
