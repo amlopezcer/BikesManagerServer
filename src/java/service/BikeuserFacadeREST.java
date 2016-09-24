@@ -58,8 +58,8 @@ public class BikeuserFacadeREST extends AbstractFacade<Bikeuser> {
     
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Integer id) {
-        super.remove(super.find(id));
+    public String remove(@PathParam("id") Integer id) {
+        return super.removeUser(super.find(id)); //Custom removal method to return a string with the Bikeuser instance
     }
 
     @GET

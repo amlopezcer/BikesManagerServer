@@ -360,4 +360,11 @@ public abstract class AbstractFacade<T> {
         }
     }
     
+    public String removeUser(T entity) {
+        getEntityManager().remove(getEntityManager().merge(entity));
+  
+        Bikeuser bikeUser = (Bikeuser) entity;
+        return String.format(RESPONSE_KO, bikeUser.getEntityid());
+    }
+    
 }
