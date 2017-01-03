@@ -6,7 +6,7 @@
         <property name="portNumber" value="3306"/>
         <property name="databaseName" value="mysql"/>
         <property name="User" value="root"/>
-        <property name="Password" value="manolo123MY"/>
+        <property name="Password" value="manolo123MYS"/>
         <property name="URL" value="jdbc:mysql://localhost:3306/mysql?zeroDateTimeBehavior=convertToNull"/>
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
     </jdbc-connection-pool>
@@ -16,7 +16,7 @@
         <property name="portNumber" value="3306"/>
         <property name="databaseName" value="bikesmanager"/>
         <property name="User" value="root"/>
-        <property name="Password" value="manolo123MY"/>
+        <property name="Password" value="manolo123MYS"/>
         <property name="URL" value="jdbc:mysql://localhost:3306/bikesmanager?zeroDateTimeBehavior=convertToNull"/>
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
     </jdbc-connection-pool>
