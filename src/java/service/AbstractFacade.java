@@ -173,10 +173,16 @@ public abstract class AbstractFacade<T> {
     }
     
     // Edit for the Bikestation (taking, leaving bikes...)
-    public String editBikeStation(T entity, String operation) {        
+    public synchronized String editBikeStation(T entity, String operation) {        
         Bikestation bikeStation = (Bikestation) entity;
         
-        if(bikeStation.isBikeStationUpdatable(operation)){
+        //Get current DB bikestation
+        EntityManager em = getEntityManager();
+        Query query = em.createNamedQuery("Bikestation.findById", Bikestation.class);
+        query.setParameter("id", bikeStation.getId());       
+        Bikestation currenBikeStation = (Bikestation) query.getSingleResult();
+ 
+        if(currenBikeStation.isBikeStationUpdatable(operation)){
             getEntityManager().merge(entity);
             return String.format(RESPONSE_OK, bikeStation.getEntityid());
         }

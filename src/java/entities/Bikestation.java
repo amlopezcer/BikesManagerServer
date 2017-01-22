@@ -244,12 +244,12 @@ public class Bikestation implements Serializable {
         final String OP_BOOK_MOORINGS = "book_moorings";
         
         boolean isUpdatable = false;
-        int availableMoorings =  totalmoorings - availablebikes -  reservedbikes - reservedmoorings + 1; //Because the value comes updated form the app, necessary to check limit conditions
+        int availableMoorings =  totalmoorings - availablebikes -  reservedbikes - reservedmoorings;
         
         switch (operation) {
             case OP_TAKE:
             case OP_BOOK_BIKE: //To take or book bikes requires the same condition
-                isUpdatable = availablebikes + 1 > 0; //+1 because the value comes updated form the app with a -1, necessary to check limit conditions
+                isUpdatable = availablebikes > 0;
                 break;
             case OP_LEAVE:
             case OP_BOOK_MOORINGS: //Same as before, same condition
