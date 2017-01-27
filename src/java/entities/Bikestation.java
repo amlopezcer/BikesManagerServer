@@ -248,10 +248,14 @@ public class Bikestation implements Serializable {
         
         switch (operation) {
             case OP_TAKE:
-            case OP_BOOK_BIKE: //To take or book bikes requires the same condition
+                isUpdatable = availablebikes > 0 || availablebikes == 0 && reservedbikes > 0; //For the user who has reserved, the only one who can reach this condition
+                break;
+            case OP_BOOK_BIKE:
                 isUpdatable = availablebikes > 0;
                 break;
             case OP_LEAVE:
+                isUpdatable = availableMoorings > 0 || availableMoorings == 0 && reservedmoorings > 0;
+                break;
             case OP_BOOK_MOORINGS: //Same as before, same condition
                 isUpdatable = availableMoorings > 0;
                 break;
