@@ -102,7 +102,7 @@ public abstract class AbstractFacade<T> {
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Booking.findByUsername", Booking.class);
         query.setParameter("username", username);
-        List<Booking> bookingList = query.getResultList(); //An user can have 2 bookings (bike and moorings)
+        List<Booking> bookingList = query.getResultList(); //The user can have 2 bookings (bike and moorings)
         
         String response = "";
         
@@ -370,7 +370,7 @@ public abstract class AbstractFacade<T> {
         getEntityManager().remove(getEntityManager().merge(entity));
   
         Bikeuser bikeUser = (Bikeuser) entity;
-        return String.format(RESPONSE_KO, bikeUser.getEntityid());
+        return String.format(RESPONSE_OK, bikeUser.getEntityid());
     }
     
 }

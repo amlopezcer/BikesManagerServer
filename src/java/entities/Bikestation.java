@@ -256,7 +256,7 @@ public class Bikestation implements Serializable {
             case OP_LEAVE:
                 isUpdatable = availableMoorings > 0 || availableMoorings == 0 && reservedmoorings > 0;
                 break;
-            case OP_BOOK_MOORINGS: //Same as before, same condition
+            case OP_BOOK_MOORINGS: 
                 isUpdatable = availableMoorings > 0;
                 break;
         }
