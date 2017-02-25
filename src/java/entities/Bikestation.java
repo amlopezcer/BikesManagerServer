@@ -241,7 +241,7 @@ public class Bikestation implements Serializable {
         final String OP_TAKE = "take";
         final String OP_LEAVE = "leave";
         final String OP_BOOK_BIKE = "book_bike";
-        final String OP_BOOK_MOORINGS = "book_moorings";
+        final String OP_BOOK_MOORINGS = "book_slot";
         
         boolean isUpdatable = false;
         int availableMoorings =  totalmoorings - availablebikes -  reservedbikes - reservedmoorings;
