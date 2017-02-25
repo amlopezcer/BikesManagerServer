@@ -24,11 +24,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Bikestation.findAll", query = "SELECT b FROM Bikestation b"),
-    @NamedQuery(name = "Bikestation.updateTimedOutBookings", query = "UPDATE Bikestation b SET b.reservedmoorings = :reservedmoorings, b.reservedbikes = :reservedbikes, b.availablebikes = :availablebikes WHERE b.id = :id"),
+    @NamedQuery(name = "Bikestation.updateTimedOutBookings", query = "UPDATE Bikestation b SET b.reservedslots = :reservedslots, b.reservedbikes = :reservedbikes, b.availablebikes = :availablebikes WHERE b.id = :id"),
     @NamedQuery(name = "Bikestation.findById", query = "SELECT b FROM Bikestation b WHERE b.id = :id"),
     @NamedQuery(name = "Bikestation.findByAddress", query = "SELECT b FROM Bikestation b WHERE b.address = :address"),
-    @NamedQuery(name = "Bikestation.findByTotalmoorings", query = "SELECT b FROM Bikestation b WHERE b.totalmoorings = :totalmoorings"),
-    @NamedQuery(name = "Bikestation.findByReservedmoorings", query = "SELECT b FROM Bikestation b WHERE b.reservedmoorings = :reservedmoorings"),
+    @NamedQuery(name = "Bikestation.findByTotalslots", query = "SELECT b FROM Bikestation b WHERE b.totalslots = :totalslots"),
+    @NamedQuery(name = "Bikestation.findByReservedslots", query = "SELECT b FROM Bikestation b WHERE b.reservedslots = :reservedslots"),
     @NamedQuery(name = "Bikestation.findByAvailablebikes", query = "SELECT b FROM Bikestation b WHERE b.availablebikes = :availablebikes"),
     @NamedQuery(name = "Bikestation.findByReservedbikes", query = "SELECT b FROM Bikestation b WHERE b.reservedbikes = :reservedbikes"),
     @NamedQuery(name = "Bikestation.findByLatitude", query = "SELECT b FROM Bikestation b WHERE b.latitude = :latitude"),
@@ -52,12 +52,12 @@ public class Bikestation implements Serializable {
     private String address;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "totalmoorings")
-    private int totalmoorings;
+    @Column(name = "totalslots")
+    private int totalslots;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "reservedmoorings")
-    private int reservedmoorings;
+    @Column(name = "reservedslots")
+    private int reservedslots;
     @Basic(optional = false)
     @NotNull
     @Column(name = "availablebikes")
@@ -101,11 +101,11 @@ public class Bikestation implements Serializable {
         this.id = id;
     }
 
-    public Bikestation(Integer id, String address, int totalmoorings, int reservedmoorings, int availablebikes, int reservedbikes, float latitude, float longitude, String md5, Date changetimestamp, float basicfare, String entityid) {
+    public Bikestation(Integer id, String address, int totalslots, int reservedslots, int availablebikes, int reservedbikes, float latitude, float longitude, String md5, Date changetimestamp, float basicfare, String entityid) {
         this.id = id;
         this.address = address;
-        this.totalmoorings = totalmoorings;
-        this.reservedmoorings = reservedmoorings;
+        this.totalslots = totalslots;
+        this.reservedslots = reservedslots;
         this.availablebikes = availablebikes;
         this.reservedbikes = reservedbikes;
         this.latitude = latitude;
@@ -132,20 +132,20 @@ public class Bikestation implements Serializable {
         this.address = address;
     }
 
-    public int getTotalmoorings() {
-        return totalmoorings;
+    public int getTotalslots() {
+        return totalslots;
     }
 
-    public void setTotalmoorings(int totalmoorings) {
-        this.totalmoorings = totalmoorings;
+    public void setTotalslots(int totalslots) {
+        this.totalslots = totalslots;
     }
 
-    public int getReservedmoorings() {
-        return reservedmoorings;
+    public int getReservedslots() {
+        return reservedslots;
     }
 
-    public void setReservedmoorings(int reservedmoorings) {
-        this.reservedmoorings = reservedmoorings;
+    public void setReservedslots(int reservedslots) {
+        this.reservedslots = reservedslots;
     }
 
     public int getAvailablebikes() {
@@ -241,10 +241,10 @@ public class Bikestation implements Serializable {
         final String OP_TAKE = "take";
         final String OP_LEAVE = "leave";
         final String OP_BOOK_BIKE = "book_bike";
-        final String OP_BOOK_MOORINGS = "book_slot";
+        final String OP_BOOK_SLOTS = "book_slot";
         
         boolean isUpdatable = false;
-        int availableMoorings =  totalmoorings - availablebikes -  reservedbikes - reservedmoorings;
+        int availableSlots =  totalslots - availablebikes -  reservedbikes - reservedslots;
         
         switch (operation) {
             case OP_TAKE:
@@ -254,10 +254,10 @@ public class Bikestation implements Serializable {
                 isUpdatable = availablebikes > 0;
                 break;
             case OP_LEAVE:
-                isUpdatable = availableMoorings > 0 || availableMoorings == 0 && reservedmoorings > 0;
+                isUpdatable = availableSlots > 0 || availableSlots == 0 && reservedslots > 0;
                 break;
-            case OP_BOOK_MOORINGS: 
-                isUpdatable = availableMoorings > 0;
+            case OP_BOOK_SLOTS: 
+                isUpdatable = availableSlots > 0;
                 break;
         }
         
@@ -269,8 +269,8 @@ public class Bikestation implements Serializable {
         reservedbikes--;
     }
     
-    public void cancelMooringsBooking() {
-        reservedmoorings--;
+    public void cancelSlotsBooking() {
+        reservedslots--;
     }
     
 }

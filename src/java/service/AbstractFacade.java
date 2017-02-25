@@ -102,7 +102,7 @@ public abstract class AbstractFacade<T> {
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Booking.findByUsername", Booking.class);
         query.setParameter("username", username);
-        List<Booking> bookingList = query.getResultList(); //The user can have 2 bookings (bike and moorings)
+        List<Booking> bookingList = query.getResultList(); //The user can have 2 bookings (bike and slots)
         
         String response = "";
         
@@ -161,11 +161,11 @@ public abstract class AbstractFacade<T> {
         if(timedOutBooking.getBooktype() == Booking.BOOKING_TYPE_BIKE) {
             bikeStation.cancelBikeBooking();
         } else
-            bikeStation.cancelMooringsBooking();
+            bikeStation.cancelSlotsBooking();
         
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Bikestation.updateTimedOutBookings", Bikestation.class);                  
-        query.setParameter("reservedmoorings", bikeStation.getReservedmoorings());
+        query.setParameter("reservedslots", bikeStation.getReservedslots());
         query.setParameter("reservedbikes", bikeStation.getReservedbikes());
         query.setParameter("availablebikes", bikeStation.getAvailablebikes());
         query.setParameter("id", bikeStation.getId());
@@ -297,15 +297,15 @@ public abstract class AbstractFacade<T> {
                 updateUser = true;
             }
 
-            if(bikeUser.isMooringsBookingTimedOut()) {
-                bikeUser.cancelMooringsBooking();
+            if(bikeUser.isSlotsBookingTimedOut()) {
+                bikeUser.cancelSlotsBooking();
                 updateUser = true;
             }
 
             if(updateUser) {
                 query = em.createNamedQuery("Bikeuser.updateTimedOutBookings", Bikeuser.class);                  
                 query.setParameter("booktaken", bikeUser.getBooktaken());
-                query.setParameter("mooringstaken", bikeUser.getMooringstaken());
+                query.setParameter("slotstaken", bikeUser.getSlotstaken());
                 query.setParameter("id", bikeUser.getId());
                 query.executeUpdate();
             }

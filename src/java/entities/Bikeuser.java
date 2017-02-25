@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Bikeuser.findAll", query = "SELECT b FROM Bikeuser b"),
-    @NamedQuery(name = "Bikeuser.updateTimedOutBookings", query = "UPDATE Bikeuser b SET b.booktaken = :booktaken, b.mooringstaken = :mooringstaken WHERE b.id = :id"),
+    @NamedQuery(name = "Bikeuser.updateTimedOutBookings", query = "UPDATE Bikeuser b SET b.booktaken = :booktaken, b.slotstaken = :slotstaken WHERE b.id = :id"),
     @NamedQuery(name = "Bikeuser.findById", query = "SELECT b FROM Bikeuser b WHERE b.id = :id"),
     @NamedQuery(name = "Bikeuser.findByUsername", query = "SELECT b FROM Bikeuser b WHERE b.username = :username"),
     @NamedQuery(name = "Bikeuser.findByPassword", query = "SELECT b FROM Bikeuser b WHERE b.password = :password"),
@@ -34,14 +34,14 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Bikeuser.findByMd5", query = "SELECT b FROM Bikeuser b WHERE b.md5 = :md5"),
     @NamedQuery(name = "Bikeuser.findByBiketaken", query = "SELECT b FROM Bikeuser b WHERE b.biketaken = :biketaken"),
     @NamedQuery(name = "Bikeuser.findByBooktaken", query = "SELECT b FROM Bikeuser b WHERE b.booktaken = :booktaken"),
-    @NamedQuery(name = "Bikeuser.findByMooringstaken", query = "SELECT b FROM Bikeuser b WHERE b.mooringstaken = :mooringstaken"),
+    @NamedQuery(name = "Bikeuser.findBySlotstaken", query = "SELECT b FROM Bikeuser b WHERE b.slotstaken = :slotstaken"),
     @NamedQuery(name = "Bikeuser.findByBookaddress", query = "SELECT b FROM Bikeuser b WHERE b.bookaddress = :bookaddress"),
-    @NamedQuery(name = "Bikeuser.findByMooringsaddress", query = "SELECT b FROM Bikeuser b WHERE b.mooringsaddress = :mooringsaddress"),
+    @NamedQuery(name = "Bikeuser.findBySlotsaddress", query = "SELECT b FROM Bikeuser b WHERE b.slotsaddress = :slotsaddress"),
     @NamedQuery(name = "Bikeuser.findByBookdate", query = "SELECT b FROM Bikeuser b WHERE b.bookdate = :bookdate"),
-    @NamedQuery(name = "Bikeuser.findByMooringsdate", query = "SELECT b FROM Bikeuser b WHERE b.mooringsdate = :mooringsdate"),
+    @NamedQuery(name = "Bikeuser.findBySlotsdate", query = "SELECT b FROM Bikeuser b WHERE b.slotsdate = :slotsdate"),
     @NamedQuery(name = "Bikeuser.findByBalance", query = "SELECT b FROM Bikeuser b WHERE b.balance = :balance")})
 public class Bikeuser implements Serializable {
-
+   
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 45)
@@ -90,8 +90,8 @@ public class Bikeuser implements Serializable {
     private boolean booktaken;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "mooringstaken")
-    private boolean mooringstaken;
+    @Column(name = "slotstaken")
+    private boolean slotstaken;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -100,8 +100,8 @@ public class Bikeuser implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
-    @Column(name = "mooringsaddress")
-    private String mooringsaddress;
+    @Column(name = "slotsaddress")
+    private String slotsaddress;
     @Basic(optional = false)
     @NotNull
     @Column(name = "bookdate")
@@ -109,9 +109,9 @@ public class Bikeuser implements Serializable {
     private Date bookdate;
     @Basic(optional = false)
     @NotNull
-    @Column(name = "mooringsdate")
+    @Column(name = "slotsdate")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date mooringsdate;
+    private Date slotsdate;
     @Basic(optional = false)
     @NotNull
     @Column(name = "balance")
@@ -124,7 +124,7 @@ public class Bikeuser implements Serializable {
         this.id = id;
     }
 
-    public Bikeuser(Integer id, String username, String password, String fullname, String email, String md5, boolean biketaken, boolean booktaken, boolean mooringstaken, String bookaddress, String mooringsaddress, Date bookdate, Date mooringsdate, float balance) {
+    public Bikeuser(Integer id, String username, String password, String fullname, String email, String md5, boolean biketaken, boolean booktaken, boolean slotstaken, String bookaddress, String slotsaddress, Date bookdate, Date slotsdate, float balance) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -133,11 +133,11 @@ public class Bikeuser implements Serializable {
         this.md5 = md5;
         this.biketaken = biketaken;
         this.booktaken = booktaken;
-        this.mooringstaken = mooringstaken;
+        this.slotstaken = slotstaken;
         this.bookaddress = bookaddress;
-        this.mooringsaddress = mooringsaddress;
+        this.slotsaddress = slotsaddress;
         this.bookdate = bookdate;
-        this.mooringsdate = mooringsdate;
+        this.slotsdate = slotsdate;
         this.balance = balance;
     }
 
@@ -205,12 +205,12 @@ public class Bikeuser implements Serializable {
         this.booktaken = booktaken;
     }
 
-    public boolean getMooringstaken() {
-        return mooringstaken;
+    public boolean getSlotstaken() {
+        return slotstaken;
     }
 
-    public void setMooringstaken(boolean mooringstaken) {
-        this.mooringstaken = mooringstaken;
+    public void setSlotstaken(boolean slotstaken) {
+        this.slotstaken = slotstaken;
     }
 
     public String getBookaddress() {
@@ -221,12 +221,12 @@ public class Bikeuser implements Serializable {
         this.bookaddress = bookaddress;
     }
 
-    public String getMooringsaddress() {
-        return mooringsaddress;
+    public String getSlotsaddress() {
+        return slotsaddress;
     }
 
-    public void setMooringsaddress(String mooringsaddress) {
-        this.mooringsaddress = mooringsaddress;
+    public void setSlotsaddress(String slotsaddress) {
+        this.slotsaddress = slotsaddress;
     }
 
     public Date getBookdate() {
@@ -237,12 +237,12 @@ public class Bikeuser implements Serializable {
         this.bookdate = bookdate;
     }
 
-    public Date getMooringsdate() {
-        return mooringsdate;
+    public Date getSlotsdate() {
+        return slotsdate;
     }
 
-    public void setMooringsdate(Date mooringsdate) {
-        this.mooringsdate = mooringsdate;
+    public void setSlotsdate(Date slotsdate) {
+        this.slotsdate = slotsdate;
     }
 
     public float getBalance() {
@@ -286,12 +286,15 @@ public class Bikeuser implements Serializable {
         this.entityid = entityid;
     }
     
+    
     public void cancelBikeBooking() {
         booktaken = false;
+        bookaddress = "None";
     }
     
-    public void cancelMooringsBooking() {
-        mooringstaken = false;
+    public void cancelSlotsBooking() {
+        slotstaken = false;
+        slotsaddress = "None";
     }
     
     public boolean isBikeBookingTimedOut(){
@@ -301,11 +304,11 @@ public class Bikeuser implements Serializable {
         return booktaken && (remainingTime <= 0);
     }
     
-    public boolean isMooringsBookingTimedOut(){
+    public boolean isSlotsBookingTimedOut(){
         long now = System.currentTimeMillis();
-        long remainingTime = Booking.MAX_BOOKING_TIME - (now - mooringsdate.getTime());
+        long remainingTime = Booking.MAX_BOOKING_TIME - (now - slotsdate.getTime());
       
-        return mooringstaken && (remainingTime <= 0);
+        return slotstaken && (remainingTime <= 0);
     }
     
 }

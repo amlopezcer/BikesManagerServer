@@ -40,7 +40,7 @@ public class Booking implements Serializable {
     
     public static final int MAX_BOOKING_TIME = 1800000; //30'
     public static final int BOOKING_TYPE_BIKE = 1; //To identify the booking type
-    public static final int BOOKING_TYPE_MOORINGS = 2; //To identify the booking type
+    public static final int BOOKING_TYPE_SLOTS = 2; //To identify the booking type
 
     private static final long serialVersionUID = 1L;
     @Id
