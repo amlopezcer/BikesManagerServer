@@ -2,6 +2,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -241,27 +242,78 @@ public class Bikestation implements Serializable {
         final String OP_TAKE = "take";
         final String OP_LEAVE = "leave";
         final String OP_BOOK_BIKE = "book_bike";
-        final String OP_BOOK_SLOTS = "book_slot";
+        final String OP_BOOK_SLOTS = "book_slots";
+        
+        final String OP_TAKE_WITH_BOOK = "take_book";
+        final String OP_LEAVE_WITH_BOOK = "leave_book";
         
         boolean isUpdatable = false;
         int availableSlots =  totalslots - availablebikes -  reservedbikes - reservedslots;
         
         switch (operation) {
             case OP_TAKE:
-                isUpdatable = availablebikes > 0 || availablebikes == 0 && reservedbikes > 0; //For the user who has reserved, the only one who can reach this condition
+                //isUpdatable = availablebikes > 0 || availablebikes == 0 && reservedbikes > 0; //For the user who has reserved, the only one who can reach this condition
+                isUpdatable = availablebikes > 0;
+                if(isUpdatable)
+                    takeBike();
                 break;
             case OP_BOOK_BIKE:
                 isUpdatable = availablebikes > 0;
+                if(isUpdatable)
+                    bookBike();
                 break;
             case OP_LEAVE:
-                isUpdatable = availableSlots > 0 || availableSlots == 0 && reservedslots > 0;
+                //isUpdatable = availableSlots > 0 || availableSlots == 0 && reservedslots > 0;
+                isUpdatable = availableSlots > 0;
+                if(isUpdatable)
+                    leaveBike();
                 break;
             case OP_BOOK_SLOTS: 
                 isUpdatable = availableSlots > 0;
+                if(isUpdatable)
+                    bookSlots();
                 break;
+            case OP_TAKE_WITH_BOOK:
+                isUpdatable = true; // You have a booking, so you can perform de op.
+                takeBikeBook();
+                break;
+            case OP_LEAVE_WITH_BOOK: 
+                isUpdatable = true;
+                leaveBikeBook();
+                break;    
         }
         
+        if(isUpdatable)
+            updateCurrentTime();         
+        
         return isUpdatable;
+    }
+    
+    private void takeBike() {
+        availablebikes--;        
+    }
+    
+    private void leaveBike() {
+        availablebikes++;
+    }
+    
+    private void bookBike() {
+        availablebikes--;
+        reservedbikes++;
+    }
+    
+    private void bookSlots() {
+        reservedslots++;
+    }
+    
+    private void takeBikeBook() {
+        cancelBikeBooking();
+        takeBike();
+    }
+    
+    private void leaveBikeBook() {
+        cancelSlotsBooking();
+        leaveBike();
     }
     
     public void cancelBikeBooking() {
@@ -272,5 +324,11 @@ public class Bikestation implements Serializable {
     public void cancelSlotsBooking() {
         reservedslots--;
     }
+    
+    public void updateCurrentTime() {
+        setChangetimestamp(Calendar.getInstance().getTime());
+    }
+    
+    
     
 }

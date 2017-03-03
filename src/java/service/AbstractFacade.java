@@ -183,7 +183,7 @@ public abstract class AbstractFacade<T> {
         Bikestation currenBikeStation = (Bikestation) query.getSingleResult();
  
         if(currenBikeStation.isBikeStationUpdatable(operation)){
-            getEntityManager().merge(entity);
+            getEntityManager().merge(currenBikeStation);
             return String.format(RESPONSE_OK, bikeStation.getEntityid());
         }
         
