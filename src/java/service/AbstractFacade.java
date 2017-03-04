@@ -155,7 +155,7 @@ public abstract class AbstractFacade<T> {
         query.executeUpdate(); 
     }
     
-    private void updateStationWithoutTimedOutBookings(Booking timedOutBooking) {
+    private synchronized void updateStationWithoutTimedOutBookings(Booking timedOutBooking) {
         Bikestation bikeStation = findByStationAddress(timedOutBooking.getBookaddress());
                     
         if(timedOutBooking.getBooktype() == Booking.BOOKING_TYPE_BIKE) {
@@ -190,7 +190,7 @@ public abstract class AbstractFacade<T> {
         return String.format(RESPONSE_KO, bikeStation.getEntityid());
     }
     
-    public String editBasicBikeStation(T entity) {
+    public synchronized String editBasicBikeStation(T entity) {
         Bikestation bikeStation = (Bikestation) entity;
         getEntityManager().merge(entity);
         return String.format(RESPONSE_OK, bikeStation.getEntityid());

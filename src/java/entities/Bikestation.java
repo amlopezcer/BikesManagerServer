@@ -243,16 +243,16 @@ public class Bikestation implements Serializable {
         final String OP_LEAVE = "leave";
         final String OP_BOOK_BIKE = "book_bike";
         final String OP_BOOK_SLOTS = "book_slots";
-        
         final String OP_TAKE_WITH_BOOK = "take_book";
-        final String OP_LEAVE_WITH_BOOK = "leave_book";
+        final String OP_LEAVE_WITH_BOOK = "leave_book";  
+        final String OP_CANCEL_BOOK_BIKE = "cancel_book_bike";
+        final String OP_CANCEL_BOOK_SLOTS = "cancel_book_slots";
         
         boolean isUpdatable = false;
         int availableSlots =  totalslots - availablebikes -  reservedbikes - reservedslots;
         
         switch (operation) {
             case OP_TAKE:
-                //isUpdatable = availablebikes > 0 || availablebikes == 0 && reservedbikes > 0; //For the user who has reserved, the only one who can reach this condition
                 isUpdatable = availablebikes > 0;
                 if(isUpdatable)
                     takeBike();
@@ -263,7 +263,6 @@ public class Bikestation implements Serializable {
                     bookBike();
                 break;
             case OP_LEAVE:
-                //isUpdatable = availableSlots > 0 || availableSlots == 0 && reservedslots > 0;
                 isUpdatable = availableSlots > 0;
                 if(isUpdatable)
                     leaveBike();
@@ -274,12 +273,20 @@ public class Bikestation implements Serializable {
                     bookSlots();
                 break;
             case OP_TAKE_WITH_BOOK:
-                isUpdatable = true; // You have a booking, so you can perform de op.
+                isUpdatable = true; // You have a booking, so you can perform the op.
                 takeBikeBook();
                 break;
             case OP_LEAVE_WITH_BOOK: 
                 isUpdatable = true;
                 leaveBikeBook();
+                break;    
+            case OP_CANCEL_BOOK_BIKE:
+                isUpdatable = true;
+                cancelBikeBooking();
+                break;
+            case OP_CANCEL_BOOK_SLOTS:
+                isUpdatable = true;
+                cancelSlotsBooking();
                 break;    
         }
         
